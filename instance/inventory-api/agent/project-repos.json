@@ -1,0 +1,6 @@
+{
+  "inventory-api": {
+    "url": "https://github.com/platex-rehor-bot/inventory-api",
+    "upstream": "https://github.com/project-kessel/inventory-api.git"
+  }
+}
