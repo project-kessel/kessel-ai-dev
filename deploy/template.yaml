@@ -6,7 +6,7 @@ parameters:
 - name: NAMESPACE
   value: ${NAMESPACE}
 - name: BOT_IMAGE
-  value: https://quay.io/repository/redhat-services-prod/hcc-accessmanagement-tenant/fabric-kessel-ai-dev
+  value: https://quay.io/repository/redhat-services-prod/project-kessel-tenant/fabric-kessel-ai-dev
 - name: BOT_IMAGE_TAG
   required: true
 - name: BOT_LABEL
