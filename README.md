@@ -48,3 +48,4 @@ Built and deployed via [Konflux](https://konflux-ci.dev/). Pipeline definitions 
 Deployed to the shared `platform-frontend-ai-dev` namespace via app-interface. Uses the shared proxy, memory server, and Vault secrets from the primary instance.
 
 See [dev-bot/docs/ONBOARDING.md](dev-bot/docs/ONBOARDING.md) for full onboarding steps.
+
