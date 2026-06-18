@@ -1,12 +1,12 @@
 apiVersion: template.openshift.io/v1
 kind: Template
 metadata:
-  name: fabric-kessel-ai-dev
+  name: kessel-ai-dev
 parameters:
 - name: NAMESPACE
   value: ${NAMESPACE}
 - name: BOT_IMAGE
-  value: https://quay.io/repository/redhat-services-prod/project-kessel-tenant/fabric-kessel-ai-dev
+  value: https://quay.io/repository/redhat-services-prod/project-kessel-tenant/kessel-ai-dev
 - name: BOT_IMAGE_TAG
   required: true
 - name: BOT_LABEL
@@ -38,7 +38,7 @@ parameters:
 objects:
 
 # ============================================================================
-# Bot-only deployment for fabric-kessel-ai-dev runner instance.
+# Bot-only deployment for kessel-ai-dev runner instance.
 #
 # Shared infrastructure (proxy, memory-server, secrets) is deployed by
 # the platform-frontend-ai-dev template in the same namespace.

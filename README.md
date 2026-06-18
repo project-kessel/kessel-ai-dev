@@ -1,4 +1,4 @@
-# fabric-kessel-ai-dev
+# kessel-ai-dev
 
 Custom bot runner for the Kessel team, built on [dev-bot](https://github.com/RedHatInsights/platform-frontend-ai-dev) (platform-frontend-ai-dev).
 
@@ -25,7 +25,7 @@ This repo contains instance-specific configuration only — the bot code lives i
 
 ```bash
 git submodule update --init --recursive
-docker build -f dev-bot/Dockerfile.runner -t fabric-kessel-ai-dev:local .
+docker build -f dev-bot/Dockerfile.runner -t kessel-ai-dev:local .
 ```
 
 ## Updating dev-bot
