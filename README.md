@@ -36,6 +36,13 @@ git add dev-bot
 git commit -m "chore: update dev-bot submodule"
 ```
 
+## CI/CD
+
+Built and deployed via [Konflux](https://konflux-ci.dev/). Pipeline definitions live in `.tekton/`.
+
+- **Push to main** → builds and pushes to the production Quay repo
+- **Pull requests** → builds a temporary image to `quay.io/redhat-user-workloads/...` (5-day expiry)
+
 ## Deployment
 
 Deployed to the shared `platform-frontend-ai-dev` namespace via app-interface. Uses the shared proxy, memory server, and Vault secrets from the primary instance.
