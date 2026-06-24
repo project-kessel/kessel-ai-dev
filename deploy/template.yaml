@@ -45,6 +45,7 @@ objects:
 # This template creates only:
 #   1. Bot Deployment (name controlled by BOT_NAME parameter)
 #   2. NetworkPolicy (egress restricted to proxy + memory-server + DNS)
+#   3. ScaledObject (KEDA cron scaler — 24/7 weekdays, off weekends)
 #
 # Prerequisites (deployed by platform-frontend-ai-dev):
 #   - devbot-proxy       (ports 3128, 9090, 8443, 8444, 8446)
@@ -238,3 +239,26 @@ objects:
         protocol: UDP
       - port: 5353
         protocol: TCP
+
+# --- Cron Scaler: 24/7 weekdays, off on weekends ---
+- apiVersion: keda.sh/v1alpha1
+  kind: ScaledObject
+  metadata:
+    name: ${BOT_NAME}-cron-scaler
+    labels:
+      app.kubernetes.io/name: ${BOT_NAME}
+      app.kubernetes.io/part-of: devbot
+  spec:
+    scaleTargetRef:
+      apiVersion: apps/v1
+      kind: Deployment
+      name: ${BOT_NAME}
+    minReplicaCount: 0
+    maxReplicaCount: 1
+    triggers:
+    - type: cron
+      metadata:
+        timezone: "UTC"
+        start: "0 0 * * 1"
+        end: "0 0 * * 6"
+        desiredReplicas: "1"
