@@ -35,6 +35,10 @@ parameters:
   required: true
 - name: SLACK_WEBHOOK_URL
   value: ""
+- name: INVENTORY_API_IMAGE
+  value: quay.io/redhat-services-prod/project-kessel-tenant/kessel-inventory/inventory-api
+- name: INVENTORY_API_IMAGE_TAG
+  value: latest
 objects:
 
 # ============================================================================
@@ -43,7 +47,7 @@ objects:
 # Shared infrastructure (proxy, memory-server, secrets) is deployed by
 # the platform-frontend-ai-dev template in the same namespace.
 # This template creates only:
-#   1. Bot Deployment (name controlled by BOT_NAME parameter)
+#   1. Bot Deployment (with PostgreSQL + inventory-api sidecars for in-cycle testing)
 #   2. NetworkPolicy (egress restricted to proxy + memory-server + DNS)
 #   3. ScaledObject (KEDA cron scaler — 24/7 weekdays, off weekends)
 #
@@ -184,6 +188,21 @@ objects:
               secretKeyRef:
                 name: devbot-secrets
                 key: e2e-password
+          # Inventory API sidecar — env vars for in-cycle e2e testing
+          - name: INV_HTTP_URL
+            value: localhost:8081
+          - name: INV_GRPC_URL
+            value: localhost:9081
+          - name: POSTGRES_HOST
+            value: localhost
+          - name: POSTGRES_PORT
+            value: "5433"
+          - name: POSTGRES_USER
+            value: postgres
+          - name: POSTGRES_PASSWORD
+            value: yPsw5e6ab4bvAGe5H
+          - name: POSTGRES_DB
+            value: spicedb
           resources:
             requests:
               cpu: "1"
@@ -193,6 +212,115 @@ objects:
               cpu: "4"
               memory: 4Gi
               ephemeral-storage: 8Gi
+
+        # PostgreSQL sidecar — shares pod network so bot reaches it at localhost:5433.
+        # Data is ephemeral (EmptyDir): starts clean on every pod restart, no PVC needed.
+        - name: postgres
+          image: registry.redhat.io/rhel9/postgresql-16:latest
+          securityContext:
+            runAsNonRoot: true
+            allowPrivilegeEscalation: false
+            seccompProfile:
+              type: RuntimeDefault
+            capabilities:
+              drop: ["ALL"]
+          env:
+          - name: POSTGRESQL_DATABASE
+            value: spicedb
+          - name: POSTGRESQL_USER
+            value: postgres
+          - name: POSTGRESQL_PASSWORD
+            value: yPsw5e6ab4bvAGe5H
+          - name: PGPORT
+            value: "5433"
+          readinessProbe:
+            exec:
+              command: ["pg_isready", "-U", "postgres", "-p", "5433"]
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            failureThreshold: 6
+          volumeMounts:
+          - name: pgdata
+            mountPath: /var/lib/pgsql/data
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+
+        # Inventory API sidecar — allow-all authz, no Kafka dependency.
+        # Waits for postgres, runs migrations, then serves on :8081 (HTTP) / :9081 (gRPC).
+        - name: inventory-api
+          image: ${INVENTORY_API_IMAGE}:${INVENTORY_API_IMAGE_TAG}
+          securityContext:
+            runAsNonRoot: true
+            allowPrivilegeEscalation: false
+            seccompProfile:
+              type: RuntimeDefault
+            capabilities:
+              drop: ["ALL"]
+          command:
+          - /bin/sh
+          - -c
+          - |
+            cat > /tmp/inventory-api.yaml <<'CONF'
+            server:
+              http:
+                address: 0.0.0.0:8081
+              grpc:
+                address: 0.0.0.0:9081
+            authn:
+              allow-unauthenticated: true
+            authz:
+              impl: allow-all
+            eventing:
+              eventer: stdout
+            storage:
+              database: postgres
+              postgres:
+                host: localhost
+                port: "5433"
+                user: postgres
+                password: yPsw5e6ab4bvAGe5H
+                dbname: spicedb
+            log:
+              level: info
+              livez: true
+              readyz: true
+            CONF
+            echo "Waiting for PostgreSQL at localhost:5433..."
+            RETRIES=0
+            until inventory-api migrate --config /tmp/inventory-api.yaml 2>/dev/null; do
+              RETRIES=$((RETRIES + 1))
+              if [ "$RETRIES" -ge 30 ]; then
+                echo "ERROR: Migration failed after 30 retries" >&2
+                exit 1
+              fi
+              echo "Database not ready, retrying migration... (attempt $RETRIES/30)"
+              sleep 2
+            done
+            echo "Migrations complete. Starting inventory-api..."
+            exec inventory-api serve --config /tmp/inventory-api.yaml
+          readinessProbe:
+            httpGet:
+              path: /api/kessel/v1/livez
+              port: 8081
+            initialDelaySeconds: 15
+            periodSeconds: 10
+            failureThreshold: 12
+          resources:
+            requests:
+              cpu: 200m
+              memory: 512Mi
+            limits:
+              cpu: "1"
+              memory: 1Gi
+
+        volumes:
+        - name: pgdata
+          emptyDir: {}
 
 # --- NetworkPolicy: Bot can only reach proxy + memory-server + DNS ---
 - apiVersion: networking.k8s.io/v1
