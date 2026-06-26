@@ -44,6 +44,7 @@ objects:
 # the platform-frontend-ai-dev template in the same namespace.
 # This template creates only:
 #   1. Bot Deployment (name controlled by BOT_NAME parameter)
+#      - PostgreSQL sidecar for local migration smoke tests
 #   2. NetworkPolicy (egress restricted to proxy + memory-server + DNS)
 #
 # Prerequisites (deployed by platform-frontend-ai-dev):
@@ -183,15 +184,68 @@ objects:
               secretKeyRef:
                 name: devbot-secrets
                 key: e2e-password
+          # PostgreSQL sidecar — env vars for setup script and migration smoke tests
+          - name: POSTGRES_HOST
+            value: localhost
+          - name: POSTGRES_PORT
+            value: "15432"
+          - name: POSTGRES_DB
+            value: inventory
+          - name: POSTGRES_USER
+            value: inventory
+          - name: POSTGRES_PASSWORD
+            value: inventory_password
           resources:
             requests:
-              cpu: "1"
-              memory: 2Gi
-              ephemeral-storage: 4Gi
-            limits:
-              cpu: "4"
+              cpu: "2"
               memory: 4Gi
               ephemeral-storage: 8Gi
+            limits:
+              cpu: "4"
+              memory: 8Gi
+              ephemeral-storage: 16Gi
+
+        # PostgreSQL sidecar — shares pod network so bot reaches it at localhost:15432.
+        # Uses the same RHEL image family as insights-rbac (OpenShift-compatible arbitrary UID).
+        # Data is ephemeral (EmptyDir): starts clean on every pod restart, no PVC needed.
+        - name: postgres
+          image: registry.redhat.io/rhel9/postgresql-16:latest
+          securityContext:
+            runAsNonRoot: true
+            allowPrivilegeEscalation: false
+            seccompProfile:
+              type: RuntimeDefault
+            capabilities:
+              drop: ["ALL"]
+          env:
+          - name: POSTGRESQL_DATABASE
+            value: inventory
+          - name: POSTGRESQL_USER
+            value: inventory
+          - name: POSTGRESQL_PASSWORD
+            value: inventory_password
+          - name: PGPORT
+            value: "15432"
+          readinessProbe:
+            exec:
+              command: ["pg_isready", "-U", "inventory", "-d", "inventory", "-p", "15432"]
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            failureThreshold: 6
+          volumeMounts:
+          - name: pgdata
+            mountPath: /var/lib/pgsql/data
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+
+        volumes:
+        - name: pgdata
+          emptyDir: {}
 
 # --- NetworkPolicy: Bot can only reach proxy + memory-server + DNS ---
 - apiVersion: networking.k8s.io/v1
