@@ -1,0 +1,26 @@
+{
+  "kessel-sdk-go": {
+    "url": "https://github.com/platex-rehor-bot/kessel-sdk-go",
+    "upstream": "https://github.com/project-kessel/kessel-sdk-go.git"
+  },
+  "kessel-sdk-py": {
+    "url": "https://github.com/platex-rehor-bot/kessel-sdk-py",
+    "upstream": "https://github.com/project-kessel/kessel-sdk-py.git"
+  },
+  "kessel-sdk-java": {
+    "url": "https://github.com/platex-rehor-bot/kessel-sdk-java",
+    "upstream": "https://github.com/project-kessel/kessel-sdk-java.git"
+  },
+  "kessel-sdk-ruby": {
+    "url": "https://github.com/platex-rehor-bot/kessel-sdk-ruby",
+    "upstream": "https://github.com/project-kessel/kessel-sdk-ruby.git"
+  },
+  "kessel-sdk-node": {
+    "url": "https://github.com/platex-rehor-bot/kessel-sdk-node",
+    "upstream": "https://github.com/project-kessel/kessel-sdk-node.git"
+  },
+  "kessel-sdk-browser": {
+    "url": "https://github.com/platex-rehor-bot/kessel-sdk-browser",
+    "upstream": "https://github.com/project-kessel/kessel-sdk-browser.git"
+  }
+}
