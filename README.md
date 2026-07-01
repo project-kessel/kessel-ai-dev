@@ -11,13 +11,21 @@ This repo contains instance-specific configuration only — the bot code lives i
 ├── deploy/
 │   └── template.yaml                 # OpenShift deploy template (bot-only)
 ├── instance/
-│   └── inventory-api/
+│   ├── inventory-api/
+│   │   └── agent/
+│   │       ├── mcp.json              # MCP server config (Jira)
+│   │       ├── project-repos.json    # Repos this instance works on
+│   │       └── personas/
+│   │           └── backend/
+│   │               └── prompt.md     # Backend coding guidelines
+│   └── kessel-sdks/
 │       └── agent/
-│           ├── mcp.json              # MCP server config (Jira)
-│           ├── project-repos.json    # Repos this instance works on
+│           ├── mcp.json
+│           ├── project-repos.json    # All kessel-sdk-* repos
 │           └── personas/
-│               └── backend/
-│                   └── prompt.md     # Backend coding guidelines
+│               ├── sdk/              # Cross-language SDK guidelines
+│               ├── backend/          # Go, Python, Java, Ruby SDKs
+│               └── frontend/         # Node and Browser SDKs
 └── dev-bot/                          # Submodule → platform-frontend-ai-dev
 ```
 
