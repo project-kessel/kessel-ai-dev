@@ -21,6 +21,34 @@ This repo contains instance-specific configuration only — the bot code lives i
 └── dev-bot/                          # Submodule → platform-frontend-ai-dev
 ```
 
+## Jira labels and repos
+
+The bot picks up tickets that have **two kinds of labels**:
+
+1. **Primary label** — set via `BOT_LABEL` in `deploy/template.yaml`. Marks tickets as eligible for this deployment.
+2. **`repo:<name>`** — on the Jira ticket. Tells the bot which repo(s) to clone. Must match a key in the instance's `project-repos.json`.
+
+| Jira primary label | Instance config | `repo:` label | Upstream repo |
+|--------------------|-----------------|---------------|---------------|
+| `hcc-ai-kessel` | `instance/inventory-api/agent/` | `repo:inventory-api` | [project-kessel/inventory-api](https://github.com/project-kessel/inventory-api) |
+
+To add a repo:
+
+1. Fork it under the bot account and add an entry to the instance's `project-repos.json`:
+
+   ```json
+   "my-repo": {
+     "url": "https://github.com/platex-rehor-bot/my-repo",
+     "upstream": "https://github.com/project-kessel/my-repo.git"
+   }
+   ```
+
+2. Label the Jira ticket with `repo:my-repo` (bare name) or `repo:project-kessel/my-repo` (org-prefixed — resolved via the upstream URL).
+
+3. Rebuild and redeploy the image so the updated `project-repos.json` is baked in.
+
+Multiple `repo:` labels on one ticket are supported for cross-repo work. A ticket without a matching `repo:` label is skipped.
+
 ## Build
 
 ```bash
