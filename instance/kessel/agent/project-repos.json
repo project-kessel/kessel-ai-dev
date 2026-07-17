@@ -35,6 +35,10 @@
     "url": "https://github.com/platex-rehor-bot/kessel-sdk-browser",
     "upstream": "https://github.com/project-kessel/kessel-sdk-browser.git"
   },
+  "parsec": {
+    "url": "https://github.com/platex-rehor-bot/parsec",
+    "upstream": "https://github.com/project-kessel/parsec.git"
+  },
   "kessel-ai-dev": {
     "url": "https://github.com/platex-rehor-bot/kessel-ai-dev",
     "upstream": "https://github.com/project-kessel/kessel-ai-dev.git"
