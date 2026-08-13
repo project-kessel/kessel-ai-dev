@@ -15,6 +15,8 @@ parameters:
   value: "0"
 - name: BOT_BOARD_NAME
   value: ""
+- name: BOT_BOARD_ID
+  value: ""
 - name: BOT_SPRINT_PREFIX
   value: ""
 - name: BOT_INCLUDE_BACKLOG
@@ -143,6 +145,8 @@ objects:
           # Bot config
           - name: BOT_BOARD_NAME
             value: ${BOT_BOARD_NAME}
+          - name: BOT_BOARD_ID
+            value: ${BOT_BOARD_ID}
           - name: BOT_SPRINT_PREFIX
             value: ${BOT_SPRINT_PREFIX}
           - name: BOT_INCLUDE_BACKLOG
