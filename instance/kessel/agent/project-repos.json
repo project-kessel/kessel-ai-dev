@@ -47,6 +47,11 @@
     "url": "https://github.com/platex-rehor-bot/docs",
     "upstream": "https://github.com/project-kessel/docs.git"
   },
+  "internal-docs": {
+    "url": "https://gitlab.cee.redhat.com/platex-rehor-bot/internal-docs.git",
+    "upstream": "https://gitlab.cee.redhat.com/project-kessel/internal-docs.git",
+    "host": "gitlab"
+  },
   "starlark-unified-schema": {
     "url": "https://github.com/platex-rehor-bot/starlark-unified-schema",
     "upstream": "https://github.com/project-kessel/starlark-unified-schema.git"
