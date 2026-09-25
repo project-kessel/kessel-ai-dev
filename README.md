@@ -25,6 +25,8 @@ This repo contains instance-specific configuration only — the bot code lives i
 │               ├── sdk-ruby/         # kessel-sdk-ruby
 │               ├── sdk-node/         # kessel-sdk-node
 │               ├── sdk-browser/      # kessel-sdk-browser
+│               ├── docs/             # project-kessel/docs
+│               ├── internal-docs/    # project-kessel/internal-docs
 │               └── tooling/          # kessel-kafka-connect
 └── dev-bot/                          # Submodule → OpenShift-Fleet/rehor
 ```
@@ -50,6 +52,7 @@ The bot picks up tickets that have **two kinds of labels**:
 | `hcc-ai-kessel` | `instance/kessel/agent/` | `repo:parsec` | [project-kessel/parsec](https://github.com/project-kessel/parsec) |
 | `hcc-ai-kessel` | `instance/kessel/agent/` | `repo:kessel-ai-dev` | [project-kessel/kessel-ai-dev](https://github.com/project-kessel/kessel-ai-dev) |
 | `hcc-ai-kessel` | `instance/kessel/agent/` | `repo:docs` | [project-kessel/docs](https://github.com/project-kessel/docs) |
+| `hcc-ai-kessel` | `instance/kessel/agent/` | `repo:internal-docs` | [project-kessel/internal-docs](https://gitlab.cee.redhat.com/project-kessel/internal-docs) |
 | `hcc-ai-kessel` | `instance/kessel/agent/` | `repo:starlark-unified-schema` | [project-kessel/starlark-unified-schema](https://github.com/project-kessel/starlark-unified-schema) |
 
 To add a repo:
@@ -60,6 +63,17 @@ To add a repo:
    "my-repo": {
      "url": "https://github.com/platex-rehor-bot/my-repo",
      "upstream": "https://github.com/project-kessel/my-repo.git"
+   }
+   ```
+
+   For a GitLab repository, add `"host": "gitlab"` and use the bot group's GitLab
+   fork URL for `url`:
+
+   ```json
+   "my-repo": {
+     "url": "https://gitlab.cee.redhat.com/platex-rehor-bot/my-repo.git",
+     "upstream": "https://gitlab.cee.redhat.com/project-kessel/my-repo.git",
+     "host": "gitlab"
    }
    ```
 
