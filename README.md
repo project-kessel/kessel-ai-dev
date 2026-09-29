@@ -11,21 +11,32 @@ This repo contains instance-specific configuration only — the bot code lives i
 ```
 ├── setup.sh                          # Instance setup (runs during Docker build)
 ├── deploy/
-│   └── template.yaml                 # OpenShift deploy template (bot-only)
+│   ├── template.yaml                 # OpenShift deploy template (kessel bot)
+│   └── gateway-template.yaml         # OpenShift deploy template (gateway bot)
 ├── instance/
-│   └── kessel/
+│   ├── kessel/
+│   │   └── agent/
+│   │       ├── mcp.json              # MCP server config (Jira)
+│   │       ├── project-repos.json    # Repos this instance works on
+│   │       └── personas/
+│   │           ├── backend/          # inventory-api, inventory-consumer
+│   │           ├── docs/             # docs
+│   │           ├── infra/            # kessel-ai-dev
+│   │           ├── parsec/           # parsec
+│   │           ├── sdk-go/           # kessel-sdk-go
+│   │           ├── sdk-py/           # kessel-sdk-py
+│   │           ├── sdk-java/         # kessel-sdk-java
+│   │           ├── sdk-ruby/         # kessel-sdk-ruby
+│   │           ├── sdk-node/         # kessel-sdk-node
+│   │           ├── sdk-browser/      # kessel-sdk-browser
+│   │           ├── starlark/         # starlark-unified-schema
+│   │           └── tooling/          # kessel-kafka-connect
+│   └── gateway/
 │       └── agent/
 │           ├── mcp.json              # MCP server config (Jira)
-│           ├── project-repos.json    # Repos this instance works on
+│           ├── project-repos.json    # app-interface (GitLab)
 │           └── personas/
-│               ├── backend/          # inventory-api, inventory-consumer
-│               ├── sdk-go/           # kessel-sdk-go
-│               ├── sdk-py/           # kessel-sdk-py
-│               ├── sdk-java/         # kessel-sdk-java
-│               ├── sdk-ruby/         # kessel-sdk-ruby
-│               ├── sdk-node/         # kessel-sdk-node
-│               ├── sdk-browser/      # kessel-sdk-browser
-│               └── tooling/          # kessel-kafka-connect
+│               └── gateway-config/   # HCC gateway onboarding
 └── dev-bot/                          # Submodule → OpenShift-Fleet/rehor
 ```
 
@@ -51,15 +62,28 @@ The bot picks up tickets that have **two kinds of labels**:
 | `hcc-ai-kessel` | `instance/kessel/agent/` | `repo:kessel-ai-dev` | [project-kessel/kessel-ai-dev](https://github.com/project-kessel/kessel-ai-dev) |
 | `hcc-ai-kessel` | `instance/kessel/agent/` | `repo:docs` | [project-kessel/docs](https://github.com/project-kessel/docs) |
 | `hcc-ai-kessel` | `instance/kessel/agent/` | `repo:starlark-unified-schema` | [project-kessel/starlark-unified-schema](https://github.com/project-kessel/starlark-unified-schema) |
+| `hcc-gateway-ai` | `instance/gateway/agent/` | `repo:app-interface` | [service/app-interface](https://gitlab.cee.redhat.com/service/app-interface) |
 
 To add a repo:
 
 1. Fork it under the bot account and add an entry to the instance's `project-repos.json`:
 
+   GitHub example:
+
    ```json
    "my-repo": {
      "url": "https://github.com/platex-rehor-bot/my-repo",
      "upstream": "https://github.com/project-kessel/my-repo.git"
+   }
+   ```
+
+   GitLab example (gateway instance):
+
+   ```json
+   "app-interface": {
+     "url": "https://gitlab.cee.redhat.com/platex-rehor-bot/app-interface.git",
+     "upstream": "https://gitlab.cee.redhat.com/service/app-interface.git",
+     "host": "gitlab"
    }
    ```
 
@@ -95,6 +119,6 @@ Built and deployed via [Konflux](https://konflux-ci.dev/). Pipeline definitions 
 
 Deployed to the shared `platform-frontend-ai-dev` namespace via app-interface. Uses the shared proxy, memory server, and Vault secrets from the primary instance. See the deploy template for resource configuration.
 
-Default `BOT_CONFIG_PATH` is `instance/kessel`. Set this in app-interface if overriding the baked-in config with a remote config repo.
+Default `BOT_CONFIG_PATH` is `instance/kessel` for the Kessel bot and `instance/gateway` for the gateway bot (`deploy/gateway-template.yaml`, label `hcc-gateway-ai`). Set this in app-interface if overriding the baked-in config with a remote config repo.
 
 See [dev-bot/docs/onboarding-new-instance.md](dev-bot/docs/onboarding-new-instance.md) for full onboarding steps.
