@@ -3,5 +3,15 @@
     "url": "https://gitlab.cee.redhat.com/platex-rehor-bot/app-interface.git",
     "upstream": "https://gitlab.cee.redhat.com/service/app-interface.git",
     "host": "gitlab"
+  },
+  "parsec": {
+    "url": "https://github.com/platex-rehor-bot/parsec",
+    "upstream": "https://github.com/project-kessel/parsec.git",
+    "readonly": true
+  },
+  "parsec-config": {
+    "url": "https://gitlab.cee.redhat.com/platform-experience-services-bot/parsec-config",
+    "upstream": "https://gitlab.cee.redhat.com/consoledot/parsec-config.git",
+    "host": "gitlab"
   }
 }
