@@ -35,6 +35,10 @@ parameters:
   required: true
 - name: SLACK_WEBHOOK_URL
   value: ""
+- name: POSTGRES_PASSWORD
+  description: PostgreSQL sidecar password (auto-generated if omitted)
+  generate: expression
+  from: "[a-zA-Z0-9]{32}"
 objects:
 
 # ============================================================================
@@ -53,6 +57,18 @@ objects:
 #   - devbot-memory-server (port 8080)
 #   - devbot-secrets     (Vault secret with git identity + credentials)
 # ============================================================================
+
+# --- PostgreSQL sidecar password (generated at deploy time) ---
+- apiVersion: v1
+  kind: Secret
+  metadata:
+    name: ${BOT_NAME}-pgpass
+    labels:
+      app.kubernetes.io/name: ${BOT_NAME}
+      app.kubernetes.io/component: bot
+      app.kubernetes.io/part-of: devbot
+  stringData:
+    password: ${POSTGRES_PASSWORD}
 
 # --- Bot Deployment ---
 - apiVersion: apps/v1
@@ -202,7 +218,10 @@ objects:
           - name: POSTGRES_USER
             value: inventory
           - name: POSTGRES_PASSWORD
-            value: inventory_password
+            valueFrom:
+              secretKeyRef:
+                name: ${BOT_NAME}-pgpass
+                key: password
           resources:
             requests:
               cpu: "2"
@@ -236,7 +255,10 @@ objects:
           - name: POSTGRESQL_USER
             value: inventory
           - name: POSTGRESQL_PASSWORD
-            value: inventory_password
+            valueFrom:
+              secretKeyRef:
+                name: ${BOT_NAME}-pgpass
+                key: password
           - name: PGPORT
             value: "15432"
           readinessProbe:
