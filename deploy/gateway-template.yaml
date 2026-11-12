@@ -35,6 +35,10 @@ parameters:
   required: true
 - name: VERTEX_ALLOWED_MODELS
   required: true
+# SLACK_WEBHOOK_URL — sourced from Vault via app-interface.
+# The secret is stored at: insights/secrets/insights-stage/kessel/rehor
+# and provided as a template parameter by the app-interface SaaS file.
+# See: data/services/insights/kessel/kessel-ai-dev.yml in app-interface.
 - name: SLACK_WEBHOOK_URL
   value: ""
 - name: KEDA_TIMEZONE
@@ -161,7 +165,9 @@ objects:
             value: http://devbot-memory-server:8080/api/bot-status
           - name: COSTS_API_URL
             value: http://devbot-memory-server:8080/api/costs
-          # Slack notifications
+          # Slack notifications — webhook URL is sourced from Vault via
+          # app-interface (not hardcoded). See the SLACK_WEBHOOK_URL
+          # parameter definition and the app-interface SaaS file.
           - name: SLACK_WEBHOOK_URL
             value: ${SLACK_WEBHOOK_URL}
           # Proxy — shared pod deployed by platform-frontend-ai-dev
