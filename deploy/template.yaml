@@ -75,6 +75,8 @@ objects:
           app.kubernetes.io/component: bot
           app.kubernetes.io/part-of: devbot
       spec:
+        serviceAccountName: ${BOT_NAME}
+        automountServiceAccountToken: false
         containers:
         - name: bot
           image: ${BOT_IMAGE}:${IMAGE_TAG}
@@ -268,6 +270,17 @@ objects:
             defaultMode: 0400
         - name: pgdata
           emptyDir: {}
+
+# --- ServiceAccount: dedicated zero-permission account for the bot pod ---
+- apiVersion: v1
+  kind: ServiceAccount
+  metadata:
+    name: ${BOT_NAME}
+    labels:
+      app.kubernetes.io/name: ${BOT_NAME}
+      app.kubernetes.io/component: bot
+      app.kubernetes.io/part-of: devbot
+  automountServiceAccountToken: false
 
 # --- NetworkPolicy: Bot can only reach proxy + memory-server + DNS ---
 - apiVersion: networking.k8s.io/v1
