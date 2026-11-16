@@ -23,7 +23,7 @@ PG_HOST="${POSTGRES_HOST:-localhost}"
 PG_PORT="${POSTGRES_PORT:-15432}"
 PG_DB="${POSTGRES_DB:-inventory}"
 PG_USER="${POSTGRES_USER:-inventory}"
-PG_PASS="${POSTGRES_PASSWORD:-inventory_password}"
+PG_PASS="${POSTGRES_PASSWORD:?POSTGRES_PASSWORD must be set (generated at deploy time)}"
 
 # ─── 1. Wait for postgres sidecar (up to 60s) ─────────────────────────────────
 
