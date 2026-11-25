@@ -103,7 +103,7 @@ go run main.go migrate \
     --storage.postgres.port=15432 \
     --storage.postgres.dbname=inventory \
     --storage.postgres.user=inventory \
-    --storage.postgres.password=inventory_password \
+    --storage.postgres.password="$POSTGRES_PASSWORD" \
     --storage.postgres.sslmode=disable
 ```
 
@@ -142,7 +142,7 @@ go run main.go migrate \
     --storage.postgres.port=15432 \
     --storage.postgres.dbname=inventory \
     --storage.postgres.user=inventory \
-    --storage.postgres.password=inventory_password \
+    --storage.postgres.password="$POSTGRES_PASSWORD" \
     --storage.postgres.sslmode=disable
 ```
 
