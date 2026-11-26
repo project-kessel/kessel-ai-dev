@@ -1,5 +1,30 @@
 workflow: jira-sprint
 source: jira
+runtime: opencode
+provider: vertex
+model: claude-opus-4-6
+image:
+  repository: quay.io/redhat-services-prod/project-kessel-tenant/kessel-ai-dev
+  tag: latest
+env:
+  BOT_INSTANCE_ID: 'Matúš Čák Trenčiansky, Pán Siedmich Brán'
+  BOT_LABEL: hcc-gateway-ai
+  BOT_BOARD_ID: '10850'
+  BOT_INCLUDE_BACKLOG: 'true'
+  BOT_CONFIG_PATH: instance/gateway
+  BOT_EXECUTION_ENGINE: coordinator
+preflights:
+  - gh-pr-status
+  - gl-mr-status
+  - id: jira-sprint
+    with:
+      label: hcc-gateway-ai
+      include_backlog: true
+schedule:
+  triggers:
+    - timezone: UTC
+      start: '0 7 * * 1-5'
+      end: '0 0 * * 1-5'
 envs:
   - slack
 claude_md:
