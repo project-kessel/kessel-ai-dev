@@ -81,6 +81,21 @@ objects:
       spec:
         serviceAccountName: ${BOT_NAME}
         automountServiceAccountToken: false
+        initContainers:
+        - name: copy-home
+          image: ${BOT_IMAGE}:${IMAGE_TAG}
+          command: ["bash", "-c", "cp -a --no-preserve=ownership /home/botuser/. /mnt/home/"]
+          securityContext:
+            runAsNonRoot: true
+            readOnlyRootFilesystem: true
+            allowPrivilegeEscalation: false
+            seccompProfile:
+              type: RuntimeDefault
+            capabilities:
+              drop: ["ALL"]
+          volumeMounts:
+          - name: bot-home
+            mountPath: /mnt/home
         containers:
         - name: bot
           image: ${BOT_IMAGE}:${IMAGE_TAG}
@@ -102,6 +117,7 @@ objects:
             exec bash entrypoint.sh
           securityContext:
             runAsNonRoot: true
+            readOnlyRootFilesystem: true
             allowPrivilegeEscalation: false
             seccompProfile:
               type: RuntimeDefault
@@ -221,6 +237,12 @@ objects:
               memory: 8Gi
               ephemeral-storage: 16Gi
           volumeMounts:
+          - name: bot-home
+            mountPath: /home/botuser
+          - name: bot-tmp
+            mountPath: /tmp
+          - name: bot-var-tmp
+            mountPath: /var/tmp
           - name: sso-secrets
             mountPath: /run/secrets/sso
             readOnly: true
@@ -233,6 +255,7 @@ objects:
           imagePullPolicy: IfNotPresent
           securityContext:
             runAsNonRoot: true
+            readOnlyRootFilesystem: true
             allowPrivilegeEscalation: false
             seccompProfile:
               type: RuntimeDefault
@@ -255,7 +278,11 @@ objects:
             failureThreshold: 6
           volumeMounts:
           - name: pgdata
-            mountPath: /var/lib/pgsql/data
+            mountPath: /var/lib/pgsql
+          - name: pg-tmp
+            mountPath: /tmp
+          - name: pg-run
+            mountPath: /run/postgresql
           resources:
             requests:
               cpu: 100m
@@ -274,7 +301,18 @@ objects:
             - key: e2e-password
               path: e2e-password
             defaultMode: 0400
+        - name: bot-home
+          emptyDir:
+            sizeLimit: 12Gi
+        - name: bot-tmp
+          emptyDir: {}
+        - name: bot-var-tmp
+          emptyDir: {}
         - name: pgdata
+          emptyDir: {}
+        - name: pg-tmp
+          emptyDir: {}
+        - name: pg-run
           emptyDir: {}
 
 # --- ServiceAccount: dedicated zero-permission account for the bot pod ---
